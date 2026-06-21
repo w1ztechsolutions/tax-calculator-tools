@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Withholding Tax Calculators</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <h1 class="site-title">Withholding Tax Calculators</h1>
+      <p class="site-subtitle">Choose the scenario that matches your transaction</p>
+    </div>
+  </header>
+
+  <main id="main" class="container" role="main" aria-labelledby="main-heading">
+    <h2 id="main-heading" class="visually-hidden">Calculator selection</h2>
+
+  <section class="cards" aria-label="Calculator options">
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario1.html">
+    <h3>Scenario 1</h3>
+    <p class="muted">General transactions having VAT and PPDA.</p>
+    <a class="card-link" href="scenarios/scenario1.html">Open Scenario 1</a>
+  </article>
+
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario2.html">
+    <h3>Scenario 2</h3>
+    <p class="muted">Hospitality industry having Tourism Levy, PPDA, VAT.</p>
+    <a class="card-link" href="scenarios/scenario2.html">Open Scenario 2</a>
+  </article>
+
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario3.html">
+    <h3>Scenario 3</h3>
+    <p class="muted">Construction industry having Retention, NCIC, PPDA, VAT.</p>
+    <a class="card-link" href="scenarios/scenario3.html">Open Scenario 3</a>
+  </article>
+
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario4.html">
+    <h3>Scenario 4</h3>
+    <p class="muted">Vehicle repairs with casual labor.</p>
+    <a class="card-link" href="scenarios/scenario4.html">Open Scenario 4</a>
+  </article>
+
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario5.html">
+    <h3>Scenario 5</h3>
+    <p class="muted">Invoice exclusive of VAT, PPDA, or NCIC, or Tourism Levy</p>
+    <a href="scenarios/scenario5.html" class="card-link">Open Scenario 5</a>
+  </article>
+
+  <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="scenarios/scenario6.html">
+    <h3>Scenario 6</h3>
+    <p class="muted">Inoice inclusive VAT only</p>
+    <a href="scenarios/scenario6.html" class="card-link">Open Scenario 6</a>
+  </article>
+ </section>
+
+    <section class="help" aria-label="How to use">
+      <h3>How to use</h3>
+      <p>Click or press Enter on a card to open the calculator for that scenario. Each scenario page will let you enter the invoice amount and will compute the base amount for applying the WHT rate.</p>
+    </section>
+
+    <p style="margin-top:1rem"><a href="../index.html">Back to Tax Calculator selection</a></p>
+  </main>
+
+  <footer class="site-footer container" role="contentinfo" aria-label="Site copyright">
+  <div class="footer-inner">
+    <p class="copyright">
+      © <span id="copyright-year"></span> WizTech Solutions. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const el = document.getElementById('copyright-year');
+    if (el) el.textContent = new Date().getFullYear();
+  })();
+</script>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
