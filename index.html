@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tax Tools — PAYE & WHT</title>
+  <link rel="stylesheet" href="wht_web/styles.css" />
+</head>
+<body>
+  <main class="container" id="main" role="main" aria-labelledby="main-heading">
+    <header class="site-header">
+      <div class="container">
+        <h1 class="site-title">Tax Tools</h1>
+        <p class="site-subtitle">Tax calculations made easy</p>
+      </div>
+    </header>
+    <!--<nav class="selector" role="navigation" aria-label="Calculator selector">
+      <a href="./paye_web/index.html" class="card-link" id="btn-paye" target="_blank" rel="noopener norefferrer">PAYE Calculator</a>
+      <a href="./wht_web/index.html" class="card-link" id="btn-wht" target="_blank" rel="noopener norefferrer">WHT Calculator</a>
+      <!-<button data-route="paye" id="btn-paye" class="nav-btn">PAYE Calculator</button>-->
+      <!--<button type="button" id="btn-paye" class="nav-btn">WHT Calculator</button>-->
+      <!--<a href="https://tax-tools.netlify.app/" id="btn-wht" class="nav-btn" target="_blank" rel="noopener norefferrer"> WHT Calculator</a>->
+    </nav>
+    -->
+
+    <h2 id="main-heading" class="visually-hidden">Welcome</h2>
+    <p>Select your preffered tax calculator to begin.</p>
+
+    <section class="cards">
+      <article class="card" tabindex="0" role="button" aria-pressed="false" target="_blank " data-target="paye_web/index.html">
+        <h3>PAYE</h3>
+        <p class="muted">This lets you calculate the Pay As You Earn Tax with accuracy</p>
+        <a href="paye_web/index.html" class="card-link" target="_blank" rel="noopener norefferrer">Open PAYE Calculator</a>
+      </article>
+
+      <article class="card" tabindex="0" role="button" aria-pressed="false" data-target="wht_web/index.html" >
+        <h3>WITHHOLDING TAX</h3>
+        <p class="muted">This lets you claculate Withholding tax accurately and with ease</p>
+        <a href="wht_web/index.html" class="card-link" target="_blank" rel="noopener norefferrer">Open WHT Calculator</a>
+      </article>
+    </section>
+
+  </main>
+
+  <script src="wht_web/script.js" defer></script>
+</body>
+</html>
