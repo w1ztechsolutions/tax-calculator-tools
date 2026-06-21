@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scenario 3 — Construction industry</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#calc">Skip to calculator</a>
+
+  <header class="site-header container">
+    <h1>Scenario 3 — Construction industry</h1>
+    <p class="muted">Construction industry having Retention, NCIC, PPDA, VAT.</p>
+  </header>
+
+  <main id="calc" class="container" role="main">
+    <form id="wht-form" aria-label="Construction withholding tax calculator" novalidate>
+      <div>
+        <label for="invoice-amount"><strong>Invoice amount (total included)</strong></label>
+        <input id="invoice-amount" name="invoiceAmount" type="number" inputmode="decimal" step="0.01" required />
+      </div>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <div style="flex:1; min-width:160px;">
+          <label for="vat-rate">VAT rate (%)</label>
+          <input id="vat-rate" name="vatRate" type="number" step="0.01" value="17.5" required />
+        </div>
+        <div style="flex:1; min-width:160px;">
+          <label for="retention-rate">Retention rate (%)</label>
+          <input id="retention-rate" name="retentionRate" type="number" step="0.01" value="5.0" required />
+        </div>
+      </div>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem;">
+        <div style="flex:1; min-width:160px;">
+          <label for="ppda-rate">PPDA rate (%)</label>
+          <input id="ppda-rate" name="ppdaRate" type="number" step="0.01" value="1.0" required />
+        </div>
+        <div style="flex:1; min-width:160px;">
+          <label for="ncic-rate">NCIC rate (%)</label>
+          <input id="ncic-rate" name="ncicRate" type="number" step="0.01" value="1.0" required />
+        </div>
+      </div>
+
+      <div style="margin-top:.5rem;">
+        <label for="wht-rate">WHT rate (%)</label>
+        <input id="wht-rate" name="whtRate" type="number" step="0.01" value="10.0" required />
+      </div>
+
+      <div style="margin-top:.75rem">
+        <button id="calc-btn" type="submit">Calculate</button>
+        <button id="reset-btn" type="button">Reset</button>
+      </div>
+    </form>
+
+    <section id="results" aria-live="polite" style="margin-top:1rem"></section>
+
+    <p style="margin-top:1rem"><a href="../index.html">Back to selection</a></p>
+  </main>
+
+  <script type="module">
+    import { computeScenario3 } from './scenario3.js';
+
+    const form = document.getElementById('wht-form');
+    const results = document.getElementById('results');
+    const resetBtn = document.getElementById('reset-btn');
+
+    function formatCurrency(n) {
+      return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      results.innerHTML = '';
+
+      try {
+        const invoice = document.getElementById('invoice-amount').value;
+        const vatRate = document.getElementById('vat-rate').value;
+        const retentionRate = document.getElementById('retention-rate').value;
+        const ppdaRate = document.getElementById('ppda-rate').value;
+        const ncicRate = document.getElementById('ncic-rate').value;
+        const whtRate = document.getElementById('wht-rate').value;
+
+        const out = computeScenario3({
+          invoice,
+          vatRate,
+          retentionRate,
+          ppdaRate,
+          ncicRate,
+          whtRate,
+          rounding: 2
+        });
+
+        results.innerHTML = `
+          <div class="result-card">
+            <div class="result-row"><div class="result-label">Taxable amount</div><div class="result-value">MK ${formatCurrency(out.taxableAmount)}</div></div>
+            <div class="result-row"><div class="result-label">VAT (MK)</div><div class="result-value">MK ${formatCurrency(out.vatAmount)}</div></div>
+            <div class="result-row"><div class="result-label">Retention (MK)</div><div class="result-value">MK ${formatCurrency(out.retentionAmount)}</div></div>
+            <div class="result-row"><div class="result-label">PPDA (MK)</div><div class="result-value">MK ${formatCurrency(out.ppdaAmount)}</div></div>
+            <div class="result-row"><div class="result-label">NCIC (MK)</div><div class="result-value">MK ${formatCurrency(out.ncicAmount)}</div></div>
+            <div class="result-row"><div class="result-label">WHT (MK)</div><div class="result-value">MK ${formatCurrency(out.whtAmount)}</div></div>
+            <div class="result-row"><div class="result-label">Pay contractor</div><div class="result-value">MK ${formatCurrency(out.payContractor)}</div></div>
+          </div>
+        `;
+      } catch (err) {
+        console.error('Calculation error:', err);
+        results.innerHTML = `<div role="alert">Error: ${err.message}</div>`;
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      results.innerHTML = '';
+      document.getElementById('vat-rate').value = '17.5';
+      document.getElementById('retention-rate').value = '5.0';
+      document.getElementById('ppda-rate').value = '1.0';
+      document.getElementById('ncic-rate').value = '1.0';
+      document.getElementById('wht-rate').value = '10.0';
+    });
+  </script>
+
+<footer class="site-footer container" role="contentinfo" aria-label="Site copyright">
+  <div class="footer-inner">
+    <p class="copyright">
+      © <span id="copyright-year"></span> WizTech Solutions. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const el = document.getElementById('copyright-year');
+    if (el) el.textContent = new Date().getFullYear();
+  })();
+</script>
+
+</body>
+</html>

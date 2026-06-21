@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scenario 4 — Labour charge</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#calc">Skip to calculator</a>
+
+  <header class="site-header container">
+    <h1>Scenario 4 — Labour charge</h1>
+    <p class="muted">Transactions that may include a labour charge with special WHT rules.</p>
+  </header>
+
+  <main id="calc" class="container" role="main">
+    <form id="wht-form" aria-label="Labour charge withholding tax calculator" novalidate>
+      <div>
+        <label for="invoice-amount"><strong>Invoice amount (total included)</strong></label>
+        <input id="invoice-amount" name="invoiceAmount" type="number" inputmode="decimal" step="0.01" required />
+      </div>
+
+      <fieldset style="margin-top:.5rem; border:1px solid #e6edf3; padding:.5rem; border-radius:6px;">
+        <legend style="font-weight:700">Does the invoice include a labour charge?</legend>
+        <label><input id="labour-yes" name="labour" type="radio" value="yes" /> Yes</label>
+        <label style="margin-left:1rem"><input id="labour-no" name="labour" type="radio" value="no" checked /> No</label>
+
+        <div id="labour-amount-row" style="margin-top:.5rem; display:none;">
+          <label for="labour-amount">Labour amount</label>
+          <input id="labour-amount" name="labourAmount" type="number" inputmode="decimal" step="0.01" />
+        </div>
+      </fieldset>
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:.5rem;">
+        <div style="flex:1; min-width:160px;">
+          <label for="vat-rate">VAT rate (%)</label>
+          <input id="vat-rate" name="vatRate" type="number" step="0.01" value="17.5" required />
+        </div>
+        <div style="flex:1; min-width:160px;">
+          <label for="ppda-rate">PPDA rate (%)</label>
+          <input id="ppda-rate" name="ppdaRate" type="number" step="0.01" value="1.0" required />
+        </div>
+      </div>
+
+      <fieldset style="margin-top:.5rem; border:1px solid #e6edf3; padding:.5rem; border-radius:6px;">
+        <legend style="font-weight:700">Withholding tax settings</legend>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <div style="flex:1; min-width:160px;">
+            <label for="standard-wht-rate">Standard WHT rate (%)</label>
+            <input id="standard-wht-rate" name="standardWhtRate" type="number" step="0.01" value="3.0" required />
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label for="labour-wht-rate">Labour WHT rate (%)</label>
+            <input id="labour-wht-rate" name="labourWhtRate" type="number" step="0.01" value="20.0" required />
+          </div>
+        </div>
+
+        <div style="margin-top:.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
+          <div style="flex:1; min-width:160px;">
+            <label for="labour-threshold">Labour threshold (MK)</label>
+            <input id="labour-threshold" name="labourThreshold" type="number" step="0.01" value="35000" required />
+          </div>
+        </div>
+      </fieldset>
+
+      <div style="margin-top:.75rem">
+        <button id="calc-btn" type="submit">Calculate</button>
+        <button id="reset-btn" type="button">Reset</button>
+      </div>
+    </form>
+
+    <section id="results" aria-live="polite" style="margin-top:1rem"></section>
+
+    <p style="margin-top:1rem"><a href="../index.html">Back to selection</a></p>
+  </main>
+
+  <script type="module">
+    import { computeScenario4 } from './scenario4.js';
+
+    const form = document.getElementById('wht-form');
+    const results = document.getElementById('results');
+    const resetBtn = document.getElementById('reset-btn');
+    const labourYes = document.getElementById('labour-yes');
+    const labourNo = document.getElementById('labour-no');
+    const labourRow = document.getElementById('labour-amount-row');
+
+    function updateLabourRow() {
+      labourRow.style.display = labourYes.checked ? 'block' : 'none';
+    }
+    labourYes.addEventListener('change', updateLabourRow);
+    labourNo.addEventListener('change', updateLabourRow);
+
+    function formatCurrency(n) {
+      return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      results.innerHTML = '';
+
+      try {
+        const invoice = document.getElementById('invoice-amount').value;
+        const vatRate = document.getElementById('vat-rate').value;
+        const ppdaRate = document.getElementById('ppda-rate').value;
+        const standardWhtRate = document.getElementById('standard-wht-rate').value;
+        const labourWhtRate = document.getElementById('labour-wht-rate').value;
+        const labourThreshold = document.getElementById('labour-threshold').value;
+        const labourIncluded = labourYes.checked;
+        const labourAmount = document.getElementById('labour-amount').value || 0;
+
+        const out = computeScenario4({
+          invoice,
+          vatRate,
+          ppdaRate,
+          standardWhtRate,
+          labourIncluded,
+          labourAmount,
+          labourThreshold,
+          labourWhtRate,
+          rounding: 2
+        });
+
+        results.innerHTML = `
+          <div class="result-card">
+            <div class="result-row"><div class="result-label">Taxable remainder</div><div class="result-value">MK ${formatCurrency(out.taxableRemainder)}</div></div>
+            <div class="result-row"><div class="result-label">VAT (MK)</div><div class="result-value">MK ${formatCurrency(out.vatAmount)}</div></div>
+            <div class="result-row"><div class="result-label">PPDA (MK)</div><div class="result-value">MK ${formatCurrency(out.ppdaAmount)}</div></div>
+            <div class="result-row"><div class="result-label">Taxable labour above threshold (MK)</div><div class="result-value">MK ${formatCurrency(out.taxableLabour)}</div></div>
+            <div class="result-row"><div class="result-label">WHT on remainder (MK)</div><div class="result-value">MK ${formatCurrency(out.whtRemainder)}</div></div>
+            <div class="result-row"><div class="result-label">WHT on labour (MK)</div><div class="result-value">MK ${formatCurrency(out.whtLabour)}</div></div>
+            <div class="result-row"><div class="result-label">Total WHT (MK)</div><div class="result-value">MK ${formatCurrency(out.totalWht)}</div></div>
+            <div class="result-row"><div class="result-label">Pay customer</div><div class="result-value">MK ${formatCurrency(out.payCustomer)}</div></div>
+          </div>
+        `;
+      } catch (err) {
+        console.error('Calculation error:', err);
+        results.innerHTML = `<div role="alert">Error: ${err.message}</div>`;
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      results.innerHTML = '';
+      document.getElementById('vat-rate').value = '17.5';
+      document.getElementById('ppda-rate').value = '1.0';
+      document.getElementById('standard-wht-rate').value = '3.0';
+      document.getElementById('labour-wht-rate').value = '20.0';
+      document.getElementById('labour-threshold').value = '35000';
+      updateLabourRow();
+    });
+
+    updateLabourRow();
+  </script>
+
+<footer class="site-footer container" role="contentinfo" aria-label="Site copyright">
+  <div class="footer-inner">
+    <p class="copyright">
+      © <span id="copyright-year"></span> WizTech Solutions. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const el = document.getElementById('copyright-year');
+    if (el) el.textContent = new Date().getFullYear();
+  })();
+</script>
+
+</body>
+</html>

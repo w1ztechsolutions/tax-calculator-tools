@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario 6 - VAT inclusive only</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <a href="#calc" class="skip-link">Skip to Calculator</a>
+
+    <header class="site-header container">
+        <h1>Scenario 6 - Invoice inclusive VAT only</h1>
+        <p class="muted">Transactions that include VAT only in the invoice amount</p>
+    </header>
+
+    <main id="calc" class="container" role="main">
+        <form id="wht-form" aria-label="Withholding tax calculator" novalidate>
+            <div>
+                <label for="invoice-amount">Invoice amount (total)</label>
+                <input type="number" name="invoiceAmount" id="invoice-amount" inputmode="decimal" step="0.01" required aria-required="true">
+            </div>
+
+            <div>
+                <label for="vat-rate">VAT rate (%)</label>
+                <input type="number" name="vatRate" id="vat-rate" step="0.01" value="17.5" required>
+            </div>
+
+            <div>
+                <label for="wht-rate">WHT rate (%)</label>
+                <input type="number" name="whtRate" id="wht-rate" step="0.01" value="3.0" required>
+            </div>
+
+            <div style="margin-top: .75rem;">
+                <button id="calc-btn" type="submit">Calculate</button>
+                <button id="reset-btn" type="button">Reset</button>
+            </div>
+        </form>
+
+        <section id="results" aria-live="polite" style="margin-top: 1rem;"></section>
+
+        <p style="margin-top: 1rem;"><a href="../index.html">Back to selection</a></p>
+    </main>
+
+    <script type="module">
+        try{
+            import('./scenario6.js').then(({computeBaseAmount }) => {
+                const form = document.getElementById('wht-form');
+                const results = document.getElementById('results');
+                const resetBtn = document.getElementById('reset-btn');
+
+                function formatCurrency(n) {
+                    return new Intl.NumberFormat(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(n);
+                }
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    results.innerHTML = '';
+                    try {
+                        const invoice = document.getElementById('invoice-amount').value;
+                        const vatRate = document.getElementById('vat-rate').value;
+                        const whtRate = document.getElementById('wht-rate').value;
+
+                        console.log('Inputs:', {invoice, vatRate, whtRate});
+
+                        const out = computeBaseAmount({
+                            invoice,
+                            vatRate,
+                            whtRate,
+                            rounding: 2
+                        });
+
+                        console.log('Output:', out);
+
+                        results.innerHTML = `
+                            <div class="result-card">
+                                <div class="result-row"><div class="result-label"></div>Taxable Amount<div class="result-value">MK ${formatCurrency(out.taxableAmount)}</div></div>
+                                <div class="result-row"><div class="result-label"></div>VAT (MK)<div class="result-value">MK ${formatCurrency(out.vatAmount)}</div></div>
+                                <div class="result-row"><div class="result-label"></div>WHT (MK)<div class="result-value">MK ${formatCurrency(out.whtAmount)}</div></div>
+                                <div class="result-row"><div class="result-label"></div>Pay Supplier<div class="result-value">MK ${formatCurrency(out.paySupplier)}</div></div>
+                            </div>
+                        `;
+                    } catch (err) {
+                        console.error('Calculation error:', err);
+                        results.innerHTML = `<div role="alert" >Error: ${err.message}</div>`;
+                    }
+                });
+
+                resetBtn.addEventListener('click', () => {
+                    form.reset();
+                    results.innerHTML = '';
+                    document.getElementById('vat-rate').value ='17.5';
+                    document.getElementById('wht-rate').value = '3.0';
+                });
+
+            }).catch(err => {
+                console.error('Failed to import module:', err);
+                const results = document.getElementById('results');
+                if (results) results.innerHTML = `<div role="alert">Module load error: ${err.message}</div>`;
+            });
+        } catch (err) {
+            console.error('Unexpected error setting up module import:', err);
+            const results = document.getElementById('results');
+            if (results) results.innerHTML = `<div role="alert">Setup error: ${err.message}</div>`;
+        }
+    </script>
+
+    <footer class="site-footer container" role="contentinfo" aria-label="Site copyright">
+  <div class="footer-inner">
+    <p class="copyright">
+      © <span id="copyright-year"></span> WizTech Solutions. All rights reserved.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const el = document.getElementById('copyright-year');
+    if (el) el.textContent = new Date().getFullYear();
+  })();
+</script>
+
+</body>
+</html>
